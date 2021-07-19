@@ -10,6 +10,8 @@ typedef struct{
 
 void *malloc2(int tamanho);
 void atrib2(void *p1, void *p2);
+void dec(void *ptr);
+void acrec(void *ptr);
 int cont_ref(void *p1);
 
 #endif
