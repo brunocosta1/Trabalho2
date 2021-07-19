@@ -30,12 +30,12 @@ void acrec(void *ptr){
 
 }
 
-void *malloc2(int tamanho){
+void *malloc2(unsigned int tamanho){
 
     espaco *temp;
     char *ptr;
 
-    temp = (espaco*)calloc(sizeof(espaco) + tamanho, 1);
+    temp = calloc(sizeof(espaco) + tamanho, 1);
     
 
     if(temp == NULL)
@@ -47,6 +47,8 @@ void *malloc2(int tamanho){
     ptr += sizeof(espaco);
     temp->memoria_alocada = ptr;
 
+    temp->tamanho = tamanho;
+
     return (void*)ptr;
     
 }
@@ -56,12 +58,16 @@ void atrib2(void *p1, void *p2){
     char *ptr1, *ptr2;
     espaco *temp1, *temp2;
 
+    int tamanho = 0;
+
     char *aux1;
     
 
     ptr1 = (char*)p1;
     ptr1 -= (sizeof(espaco));
     temp1 = (espaco*)ptr1;
+
+
 
     if(p2 != NULL){
 
@@ -71,7 +77,7 @@ void atrib2(void *p1, void *p2){
 
         dec(p1);
 
-        memcpy(p1, p2, sizeof(void*));
+        memcpy(p1, p2, temp1->tamanho);
 
         acrec(p2);
 
@@ -98,5 +104,22 @@ int cont_ref(void *ptr){
     value = temp->contador;
 
     return value;
+
+}
+
+void dump(){
+
+    void *c = calloc(0, sizeof(void)) ;
+
+
+
+    while(1){
+
+        printf("Endereço: %x Conteúdo: %d\n", c, *(int*)c);
+        c++;
+
+
+    }
+
 
 }
