@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int primeira_alocacao = 1;
+int total_alocacao = 0;
 espaco *endereco_primeira_alocacao;
 
 void dec(void *ptr){
@@ -16,7 +16,6 @@ void dec(void *ptr){
     temp = (espaco*)ptr1;
 
     temp->contador--;
-
 
 }
 
@@ -39,7 +38,6 @@ void *malloc2(unsigned int tamanho){
     espaco *temp;
     char *ptr;
 
-
     temp = calloc(sizeof(espaco) + tamanho, 1);
     
     if(temp == NULL)
@@ -53,24 +51,22 @@ void *malloc2(unsigned int tamanho){
     temp->memoria_alocada = ptr;
     temp->tamanho = tamanho;
     temp->prox = NULL;
-    temp->ant = NULL;
 
-    if(primeira_alocacao == 1){
-
-        primeira_alocacao = 0;
-        endereco_primeira_alocacao = temp;
-
-    }else{
+    if(total_alocacao != 0){
 
         espaco *aux = endereco_primeira_alocacao;
 
         while(aux->prox != NULL)
             aux = aux->prox;
 
-        primeira_alocacao++;
-
+        total_alocacao++;
         aux->prox = temp;
-        aux->prox->ant = aux; 
+
+    }else{
+
+        total_alocacao++;
+        endereco_primeira_alocacao = temp;
+
     }
 
     return (void*)ptr;
@@ -82,9 +78,6 @@ void atrib2(void *p1, void *p2){
     char *ptr1, *ptr2;
     espaco *temp1, *temp2;
 
-    int tamanho = 0;
-
-    char *aux1;
     
 
     ptr1 = (char*)p1;
@@ -107,27 +100,43 @@ void atrib2(void *p1, void *p2){
 
     }else{
 
+        dec(p1);
         p1 = NULL;
-        temp1->contador--;
     }
 
     if(temp1->contador == 0){
         
-        if(temp1->prox == NULL && temp1->ant != NULL){ //Verificando se é o último
+        if(temp1 == endereco_primeira_alocacao){ //Verificando se é o primeiro
 
-            espaco *aux = temp1->ant;
-            temp1->ant = NULL;
+            endereco_primeira_alocacao = temp1->prox;
+            temp1->prox = NULL;
+            free(temp1);
+
+
+        }else if(temp1->prox == NULL){ //Verificando se é o último
+
+            espaco *aux = endereco_primeira_alocacao;
+
+            while(aux->prox != temp1)
+                aux = aux->prox;
+
             aux->prox = NULL;
-
+            free(temp1);
+            
         }else{
 
-            temp1->ant->prox = temp1->prox;
-            temp1->prox->ant = temp1->ant;
+            espaco *aux = endereco_primeira_alocacao;
+
+            while(aux->prox != temp1)
+                aux = aux->prox;
+
+            aux->prox = temp1->prox;
+            temp1->prox = NULL;
+            free(temp1);
 
         }
 
-        free(temp1);
-        primeira_alocacao--;
+        total_alocacao--;
 
     }
     
@@ -149,10 +158,13 @@ int cont_ref(void *ptr){
 
 }
 
+
 void dump(){
 
     espaco *aux = endereco_primeira_alocacao;
 
+
+    printf("-------------------------\n");
 
     while(aux != NULL){
 

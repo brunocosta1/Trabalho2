@@ -1,7 +1,6 @@
 #ifndef CONTREF_H
 #define CONTREF_H
 
-typedef struct heap heap;
 typedef struct espaco espaco;
 
 struct espaco {
@@ -10,15 +9,19 @@ struct espaco {
     unsigned int tamanho;
     int contador;
 
-    struct espaco *ant, *prox;
+    struct espaco *prox;
 
 };
 
 
+//Funções principais
 
-void dump();
 void *malloc2(unsigned int tamanho);
 void atrib2(void *p1, void *p2);
+void dump();
+
+//Funções auxiliares
+
 void dec(void *ptr);
 void acrec(void *ptr);
 int cont_ref(void *p1);
