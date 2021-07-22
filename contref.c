@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+int primeira_alocacao = 1;
+espaco *endereco_primeira_alocacao;
+
 void dec(void *ptr){
 
     char *ptr1;
@@ -30,14 +33,15 @@ void acrec(void *ptr){
 
 }
 
+
 void *malloc2(unsigned int tamanho){
 
     espaco *temp;
     char *ptr;
 
+
     temp = calloc(sizeof(espaco) + tamanho, 1);
     
-
     if(temp == NULL)
         return NULL;
     else
@@ -45,9 +49,29 @@ void *malloc2(unsigned int tamanho){
 
     ptr = (char*)temp;
     ptr += sizeof(espaco);
-    temp->memoria_alocada = ptr;
 
+    temp->memoria_alocada = ptr;
     temp->tamanho = tamanho;
+    temp->prox = NULL;
+    temp->ant = NULL;
+
+    if(primeira_alocacao == 1){
+
+        primeira_alocacao = 0;
+        endereco_primeira_alocacao = temp;
+
+    }else{
+
+        espaco *aux = endereco_primeira_alocacao;
+
+        while(aux->prox != NULL)
+            aux = aux->prox;
+
+        primeira_alocacao++;
+
+        aux->prox = temp;
+        aux->prox->ant = aux; 
+    }
 
     return (void*)ptr;
     
@@ -82,12 +106,30 @@ void atrib2(void *p1, void *p2){
         acrec(p2);
 
     }else{
-        temp1->memoria_alocada = NULL;
+
+        p1 = NULL;
         temp1->contador--;
     }
 
-    if(temp1->contador == 0)
+    if(temp1->contador == 0){
+        
+        if(temp1->prox == NULL && temp1->ant != NULL){ //Verificando se é o último
+
+            espaco *aux = temp1->ant;
+            temp1->ant = NULL;
+            aux->prox = NULL;
+
+        }else{
+
+            temp1->ant->prox = temp1->prox;
+            temp1->prox->ant = temp1->ant;
+
+        }
+
         free(temp1);
+        primeira_alocacao--;
+
+    }
     
 }
 
@@ -109,17 +151,18 @@ int cont_ref(void *ptr){
 
 void dump(){
 
-    void *c = calloc(0, sizeof(void)) ;
+    espaco *aux = endereco_primeira_alocacao;
 
 
+    while(aux != NULL){
 
-    while(1){
+        printf("\nEndereço: %x\n", *(unsigned int*)&aux->memoria_alocada);
+        printf("Conteúdo: %d\n", *(int*)aux->memoria_alocada);
+        printf("Tamanho: %d\n", aux->tamanho);
+        printf("Número de referencias: %d\n", aux->contador);
 
-        printf("Endereço: %x Conteúdo: %d\n", c, *(int*)c);
-        c++;
-
+        aux = aux->prox;
 
     }
-
 
 }

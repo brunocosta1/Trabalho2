@@ -1,13 +1,20 @@
 #ifndef CONTREF_H
 #define CONTREF_H
 
-typedef struct{
+typedef struct heap heap;
+typedef struct espaco espaco;
+
+struct espaco {
 
     void *memoria_alocada;
     unsigned int tamanho;
     int contador;
 
-}espaco;
+    struct espaco *ant, *prox;
+
+};
+
+
 
 void dump();
 void *malloc2(unsigned int tamanho);
